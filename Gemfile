@@ -28,6 +28,8 @@ gem "jbuilder"
 gem "http"
 gem 'selenium-webdriver'
 
+gem 'sidekiq'
+
 # Use Redis adapter to run Action Cable in production
 # gem "redis", ">= 4.0.1"
 
