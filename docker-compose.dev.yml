@@ -4,22 +4,37 @@ services:
     restart: unless-stopped
 
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/rails
+      - bundle_cache:/usr/local/bundle
     ports:
       - "3000:3000"
     env_file:
       - .env
     environment:
+      - RAILS_ENV=development
       - REDIS_URL=redis://redis:6379/0
     depends_on:
       - redis
 
   sidekiq:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     command: bundle exec sidekiq -C config/sidekiq.yml
+    volumes:
+      - .:/rails
+      - bundle_cache:/usr/local/bundle
     env_file:
       - .env
     environment:
+      - RAILS_ENV=development
       - REDIS_URL=redis://redis:6379/0
     depends_on:
       - redis
+
+volumes:
+  bundle_cache:
