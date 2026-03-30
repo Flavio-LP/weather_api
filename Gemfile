@@ -31,6 +31,10 @@ gem "sidekiq", "~> 7.0"
 gem "redis", ">= 4.0.1"
 gem 'selenium-webdriver'
 
+gem 'sidekiq'
+
+gem "dotenv-rails"
+
 # Use Redis adapter to run Action Cable in production
 # gem "redis", ">= 4.0.1"
 
