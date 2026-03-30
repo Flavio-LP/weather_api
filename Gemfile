@@ -27,6 +27,8 @@ gem "jbuilder"
 
 gem "http"
 gem "twilio-ruby", "~> 7.3"
+gem "sidekiq", "~> 7.0"
+gem "redis", ">= 4.0.1"
 gem 'selenium-webdriver'
 
 # Use Redis adapter to run Action Cable in production

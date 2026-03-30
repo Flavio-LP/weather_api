@@ -71,7 +71,7 @@ class ForecastWhatsappFormatter
     temp  = "🌡 #{day[:temp_min_c]}-#{day[:temp_max_c]}°C"
     rain  = format_rain(day[:rain_mm], day[:rain_probability_percent])
     wind  = format_wind(day[:wind_direction], day[:wind_kmh])
-    summ  = truncate(day[:summary].to_s.strip, 52)
+    summ  = truncate(day[:summary].to_s.strip, 100)
 
     [
       "#{emoji} *#{date}*",
