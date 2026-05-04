@@ -1,25 +1,22 @@
 services:
-  redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: >
+      bash -c "rm -f tmp/pids/server.pid &&
+               bundle install &&
+               bundle exec rails server -b 0.0.0.0 -p 3000"
+    volumes:
+      - .:/rails
+      - bundle_cache:/usr/local/bundle
     ports:
       - "3000:3000"
     env_file:
       - .env
     environment:
-      - REDIS_URL=redis://redis:6379/0
-    depends_on:
-      - redis
+      RAILS_ENV: development
+      RAILS_LOG_LEVEL: debug
 
-  sidekiq:
-    build: .
-    command: bundle exec sidekiq -C config/sidekiq.yml
-    env_file:
-      - .env
-    environment:
-      - REDIS_URL=redis://redis:6379/0
-    depends_on:
-      - redis
+volumes:
+  bundle_cache:
