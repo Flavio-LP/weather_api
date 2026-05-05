@@ -10,3 +10,29 @@ services:
       - .env.production
     environment:
       RAILS_LOG_LEVEL: info
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - redis
+
+  sidekiq:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: bundle exec sidekiq
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    environment:
+      RAILS_LOG_LEVEL: info
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:
