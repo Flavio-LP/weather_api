@@ -45,6 +45,20 @@ services:
     volumes:
       - redis_data:/data
 
+  whatsapp:
+    build:
+      context: ./whatsapp_service
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+    environment:
+      - PORT=3001
+    volumes:
+      - whatsapp_auth:/app/.wwebjs_auth
+
 volumes:
   bundle_cache:
   redis_data:
+  whatsapp_auth:

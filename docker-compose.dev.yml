@@ -7,6 +7,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails server -b 0.0.0.0 -p 3000"
     volumes:
       - .:/rails
       - bundle_cache:/usr/local/bundle
@@ -36,5 +37,19 @@ services:
     depends_on:
       - redis
 
+  whatsapp:
+    build:
+      context: ./whatsapp_service
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+    environment:
+      - PORT=3001
+    volumes:
+      - whatsapp_auth:/app/.wwebjs_auth
+
 volumes:
   bundle_cache:
+  whatsapp_auth:
