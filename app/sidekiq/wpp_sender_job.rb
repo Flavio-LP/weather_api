@@ -1,9 +1,7 @@
 class WppSenderJob
   include Sidekiq::Job
 
-  def perform(*args)
-    
-    response = Net::HTTP.get(URI(localhost:))
-    dados = JSON.parse(response)
+  def perform
+    SendWeatherForecastJob.perform_now
   end
 end
