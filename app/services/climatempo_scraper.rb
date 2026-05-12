@@ -135,6 +135,13 @@ class ClimatempoScraper
       humidity_vals = find_humidity_values(texts)
       hum_min, hum_max = parse_humidity(humidity_vals)
 
+      alert_imgs = blk.xpath(
+        ".//img[contains(@src,'day-alert-2026.svg') or contains(@alt,'Alerta de variação de temperatura')]"
+      )
+      temperature_alert = alert_imgs.any? do |img|
+        img.ancestors.find { |a| %w[div section article].include?(a.name) && a.at_xpath(".//text()[contains(.,'°')]") } == blk
+      end
+
       # Data
       day_number = texts.find { |t| t =~ /^(0?[1-9]|[12]\d|3[01])$/ }
       day_label  = texts.find { |t| %w[Dom Seg Ter Qua Qui Sex Sáb].include?(t) }
@@ -164,6 +171,7 @@ class ClimatempoScraper
         humidity_min_percent: hum_min,
         humidity_max_percent: hum_max,
         summary: summary,
+        temperature_alert: temperature_alert,
         _score: score
       }
     end
@@ -173,9 +181,13 @@ class ClimatempoScraper
     raw_days.each do |d|
       key = d[:date_key]
       next unless key
-      best = by_key[key]
-      if best.nil? || d[:_score] > best[:_score]
+      existing = by_key[key]
+      if existing.nil?
         by_key[key] = d
+      elsif d[:_score] > existing[:_score]
+        by_key[key] = d.merge(temperature_alert: existing[:temperature_alert] || d[:temperature_alert])
+      else
+        by_key[key] = existing.merge(temperature_alert: existing[:temperature_alert] || d[:temperature_alert])
       end
     end
 
