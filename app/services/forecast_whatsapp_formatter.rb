@@ -103,7 +103,7 @@ class ForecastWhatsappFormatter
   def format_rain(mm, prob)
     prob_int = prob.to_i
     dot = RAIN_EMOJI.find { |range, _| range.include?(prob_int) }&.last || "⚪"
-    "#{dot} #{mm.to_i}mm (#{prob_int}%)"
+    "#{dot} #{"%.1f" % (mm || 0)}mm (#{prob_int}%)"
   end
 
   def format_wind(direction, kmh)

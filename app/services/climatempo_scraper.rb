@@ -36,7 +36,7 @@ class ClimatempoScraper
   rescue => e
     Rails.logger.error("[ClimatempoScraper] #{e.class}: #{e.message}")
     Rails.logger.error("[ClimatempoScraper] backtrace: #{e.backtrace&.first(5)&.join(' | ')}")
-    raise
+    { error: e.message, days: [] }
   end
 
   private
@@ -124,16 +124,20 @@ class ClimatempoScraper
       temp_min_c = [t1, t2].min
       temp_max_c = [t1, t2].max
 
-      # Chuva — recompor “mm - %” mesmo se separados; aceitar casos só com %
-      rain_line = find_rain_line(texts)
-      rain_mm, rain_prob = parse_rain(rain_line)
-
-      # Vento e umidade
-      wind_line = find_wind_line(texts)
-      wind_dir, wind_kmh = parse_wind(wind_line)
-
+      # Umidade primeiro — para excluir seus tokens do search de chuva
       humidity_vals = find_humidity_values(texts)
       hum_min, hum_max = parse_humidity(humidity_vals)
+
+      # Chuva — remove tokens de umidade antes de buscar para evitar contaminação
+      humidity_tokens = humidity_vals.map(&:strip).to_set
+      texts_for_rain  = texts.reject { |t| humidity_tokens.include?(t.strip) }
+      rain_line = find_rain_line(texts_for_rain)
+      rain_mm, rain_prob = parse_rain(rain_line)
+      rain_prob = 0 if rain_mm.nil? || rain_mm < 0.1
+
+      # Vento
+      wind_line = find_wind_line(texts)
+      wind_dir, wind_kmh = parse_wind(wind_line)
 
       alert_imgs = blk.xpath(
         ".//img[contains(@src,'day-alert-2026.svg') or contains(@alt,'Alerta de variação de temperatura')]"
@@ -192,6 +196,10 @@ class ClimatempoScraper
     end
 
     deduped = by_key.values.map { |d| d.reject { |k,_| k == :_score || k == :date_key } }
+    deduped.each do |d|
+      mm = d[:rain_mm]
+      d[:rain_probability_percent] = 0 if mm.nil? || mm < 1.0
+    end
     deduped.sort_by! { |d| [d[:date].to_s, d[:day_label].to_s] }
     deduped.first(15)
   end
@@ -245,16 +253,12 @@ class ClimatempoScraper
     idxs.each do |i|
       window = norm[i, 10].join(" ")
       return window if window =~ /mm/i && window =~ /\b\d{1,3}\s*%/
-      return window if window =~ /\b\d{1,3}\s*%/
     end
 
     # fallback: combine primeiro mm e primeiro %
     mm_token  = norm.find { |t| t =~ /[\d.,]+\s*mm/i }
     pct_token = norm.find { |t| t =~ /\b\d{1,3}\s*%/ }
     return "#{mm_token} - #{pct_token}" if mm_token && pct_token
-
-    # sem mm, mas com % — retorna mesmo assim
-    return pct_token if pct_token
 
     nil
   end
@@ -283,7 +287,7 @@ class ClimatempoScraper
   end
 
   def parse_rain(str)
-    return [nil, nil] unless str
+    return [nil, 0] unless str
     mm   = str[/([\d.,]+)\s*mm/i, 1]
     pct  = str[/(\d{1,3})\s*%/, 1]
 
@@ -293,6 +297,8 @@ class ClimatempoScraper
     if prob
       prob = [[prob, 0].max, 100].min
     end
+
+    prob = 0 if mm_val.nil? || mm_val < 0.1
 
     [mm_val, prob]
   end
