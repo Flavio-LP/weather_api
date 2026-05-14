@@ -6,6 +6,13 @@ class SendWeatherForecastJob < ApplicationJob
       ClimatempoScraper.fetch_15_days
     end
 
+    if data[:error]
+      message = "Houve uma falha no envio na consulta das informações!"
+      url      = ENV.fetch("WHATSAPP_SERVICE_URL", "http://whatsapp:3001")
+      HTTP.post("#{url}/send", json: { message: })
+      return
+    end
+
     if data[:days].blank?
       Rails.logger.warn("[SendWeatherForecastJob] Sem dados de previsão, abortando")
       return
