@@ -7,7 +7,7 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - .env.production
+      - .env
     environment:
       RAILS_LOG_LEVEL: info
       REDIS_URL: redis://redis:6379/0
@@ -21,7 +21,7 @@ services:
     command: bundle exec sidekiq
     restart: unless-stopped
     env_file:
-      - .env.production
+      - .env
     environment:
       RAILS_LOG_LEVEL: info
       REDIS_URL: redis://redis:6379/0
@@ -40,7 +40,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     env_file:
-      - .env.production
+      - .env
     volumes:
       - whatsapp_auth:/app/.wwebjs_auth
 
