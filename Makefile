@@ -46,3 +46,6 @@ ps:
 
 clean:
 	docker system prune -f
+
+console:
+	docker compose exec web bundle exec rails console

@@ -27,9 +27,6 @@ gem "jbuilder"
 
 gem "http"
 gem "redis", ">= 4.0.1"
-gem 'selenium-webdriver'
-
-gem "dotenv-rails"
 
 # Use Redis adapter to run Action Cable in production
 # gem "redis", ">= 4.0.1"
@@ -50,9 +47,10 @@ gem "sidekiq", "~> 8.0"
 gem "sidekiq-cron", "~> 2.0"
 
 group :development, :test do
-  # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   #gem "debug", platforms: %i[ mri windows ]
   gem "dotenv-rails"
+  gem "rspec-rails", "~> 7.0"
+  gem "faker"
 end
 
 group :development do
