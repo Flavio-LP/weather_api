@@ -69,15 +69,21 @@ class ForecastWhatsappFormatter
     emoji = weather_emoji(day)
     date  = format_date(day[:date], day[:day_label])
     temp  = "🌡 #{day[:temp_min_c]}-#{day[:temp_max_c]}°C"
+    temp_alert = format_temp_alert(day[:temperature_alert])
     rain  = format_rain(day[:rain_mm], day[:rain_probability_percent])
     wind  = format_wind(day[:wind_direction], day[:wind_kmh])
     summ  = truncate(day[:summary].to_s.strip, 100)
 
-    [
+    lines = [
       "#{emoji} *#{date}*",
       "   #{temp}   #{rain}   #{wind}",
+      ("   #{temp_alert}" if temp_alert),
       "   📝 #{summ}",
-    ].join("\n")
+    ].compact.join("\n")
+  end
+
+  def format_temp_alert(alert)
+    "⚠️  Mudança brusca de temperatura" if alert
   end
 
   def format_date(iso, label)
