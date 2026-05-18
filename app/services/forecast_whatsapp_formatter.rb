@@ -44,7 +44,7 @@ class ForecastWhatsappFormatter
   def initialize(data, days_count: 12)
     @city  = data[:city] || "Forquilhinha"
     @state = data[:state] || "SC"
-    @days  = (data[:days] || []).first(days_count)
+    @days  = (data[:days] || []).reject { |d| d[:date].to_s == Date.today.to_s }.first(days_count)
   end
 
   def format
