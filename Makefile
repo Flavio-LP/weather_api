@@ -1,6 +1,6 @@
 .PHONY: dev-up dev-down dev-build dev-logs dev-restart \
         prod-up prod-down prod-build prod-logs prod-restart \
-        ps clean
+        ps clean rebuild
 
 DEV  := docker compose -f docker-compose.dev.yml
 PROD := docker compose -f docker-compose.prod.yml
@@ -49,3 +49,8 @@ clean:
 
 console:
 	docker compose exec web bundle exec rails console
+
+rebuild:
+	docker compose down -v --remove-orphans
+	docker compose build --no-cache
+	docker compose up -d
