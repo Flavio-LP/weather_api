@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3003:3003"
     env_file:
       - .env
     environment:
@@ -39,6 +39,8 @@ services:
       context: ./whatsapp_service
       dockerfile: Dockerfile
     restart: unless-stopped
+    ports:
+      - "3001:3001" 
     env_file:
       - .env
     volumes:
@@ -47,3 +49,5 @@ services:
 volumes:
   redis_data:
   whatsapp_auth:
+
+
