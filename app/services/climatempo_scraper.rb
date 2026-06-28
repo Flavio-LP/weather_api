@@ -326,16 +326,17 @@ class ClimatempoScraper
     month = today.month
     year = today.year
 
-    # Rollover simples dentro da janela de 15 dias
-    if day < today.day - 16
+    candidate = Date.new(year, month, day)
+    if candidate < today
       month += 1
       if month > 12
         month = 1
         year += 1
       end
+      candidate = Date.new(year, month, day)
     end
 
-    Date.new(year, month, day).iso8601
+    candidate.iso8601
   rescue
     nil
   end
