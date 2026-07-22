@@ -59,13 +59,7 @@ app.post('/send', async (req, res) => {
   }
 
   try {
-    const chat = await client.getChatById(targetGroup);
-
-    if (!chat) {
-      return res.status(404).json({ error: `Grupo "${targetGroup}" não encontrado` });
-    }
-
-    await chat.sendMessage(message);
+    await client.sendMessage(targetGroup, message);
     res.json({ sent: true, group: targetGroup });
   } catch (err) {
     console.error('[send] group:', targetGroup, '| erro:', err);
