@@ -8,6 +8,10 @@ Sidekiq.configure_server do |config|
       "send_weather_forecast" => {
         "cron"  => ENV.fetch("WEATHER_JOB_CRON", "0 7 * * *"),
         "class" => "SendWeatherForecastJob"
+      },
+      "send_travel_countdown" => {
+        "cron"  => ENV.fetch("WPP_JOB_CRON", "0 8 * * *"),
+        "class" => "SendTravelCountdownJob"
       }
     )
   end

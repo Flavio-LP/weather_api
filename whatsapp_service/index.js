@@ -48,25 +48,25 @@ app.post('/send', async (req, res) => {
     return res.status(503).json({ error: 'WhatsApp não está conectado' });
   }
 
-  const { message } = req.body;
+  const { message, group_id } = req.body;
   if (!message) {
     return res.status(400).json({ error: 'Campo "message" é obrigatório' });
   }
 
-  const groupId = process.env.WHATSAPP_GROUP_ID;
-  if (!groupId) {
-    return res.status(500).json({ error: 'WHATSAPP_GROUP_ID não configurado' });
+  const targetGroup = group_id ;
+  if (!targetGroup) {
+    return res.status(500).json({ error: 'group_id não informado e WHATSAPP_GROUP_ID não configurado' });
   }
 
   try {
-    const chat = await client.getChatById(groupId);
+    const chat = await client.getChatById(targetGroup);
 
     if (!chat) {
-      return res.status(404).json({ error: `Grupo "${groupId}" não encontrado` });
+      return res.status(404).json({ error: `Grupo "${targetGroup}" não encontrado` });
     }
 
     await chat.sendMessage(message);
-    res.json({ sent: true, group: groupId });
+    res.json({ sent: true, group: targetGroup });
   } catch (err) {
     console.error('[send]', err.message);
     res.status(500).json({ error: err.message });

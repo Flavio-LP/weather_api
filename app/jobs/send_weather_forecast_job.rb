@@ -6,10 +6,12 @@ class SendWeatherForecastJob < ApplicationJob
       ClimatempoScraper.fetch_15_days
     end
 
+    url      = ENV.fetch("WHATSAPP_SERVICE_URL", "http://whatsapp:3001")
+    group_id = ENV.fetch("WHATSAPP_GROUP_ID")
+
     if data[:error]
       message = "Houve uma falha no envio na consulta das informações!"
-      url      = ENV.fetch("WHATSAPP_SERVICE_URL", "http://whatsapp:3001")
-      HTTP.post("#{url}/send", json: { message: })
+      HTTP.post("#{url}/send", json: { message:, group_id: })
       return
     end
 
@@ -19,8 +21,7 @@ class SendWeatherForecastJob < ApplicationJob
     end
 
     message  = ForecastWhatsappFormatter.format(data)
-    url      = ENV.fetch("WHATSAPP_SERVICE_URL", "http://whatsapp:3001")
-    response = HTTP.post("#{url}/send", json: { message: })
+    response = HTTP.post("#{url}/send", json: { message:, group_id: })
 
     unless response.status.success?
       raise "Falha ao enviar WhatsApp: #{response.status} — #{response.body}"
