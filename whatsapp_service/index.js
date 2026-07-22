@@ -68,8 +68,11 @@ app.post('/send', async (req, res) => {
     await chat.sendMessage(message);
     res.json({ sent: true, group: targetGroup });
   } catch (err) {
-    console.error('[send]', err.message);
-    res.status(500).json({ error: err.message });
+    console.error('[send] group:', targetGroup, '| erro:', err);
+    res.status(500).json({
+      error: err.message || String(err) || 'Erro desconhecido',
+      group_id: targetGroup
+    });
   }
 });
 
